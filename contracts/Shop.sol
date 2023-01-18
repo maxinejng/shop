@@ -26,6 +26,7 @@ contract Shop {
         uint price;
         uint itemId;
         address payable seller;
+        bool isActive;
     }
 
     mapping(address => seller) sellers;
@@ -68,6 +69,7 @@ contract Shop {
         items[itemCount].category = _category;
         items[itemCount].price = _price;
         items[itemCount].itemId = itemCount;
+        items[itemCount].isActive = true;
         itemCount++;
     }
 
