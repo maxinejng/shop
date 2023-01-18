@@ -25,13 +25,13 @@ contract Shop {
         string category;
         uint price;
         uint itemId;
-        address payable seller;
+        address seller;
         bool isActive;
     }
 
-    mapping(address => seller) sellers;
+    mapping(address => seller) public sellers;
 
-    mapping(uint => item) items;
+    mapping(uint => item) public items;
 
     //count the total of seller 
     uint public sellerCount;
@@ -39,8 +39,8 @@ contract Shop {
     //count the total of item
     uint public itemCount;
 
-    modifier onlySeller() {
-        require(items[itemCount].seller == msg.sender, "You can't add an item to the shop.");
+    modifier onlyOwner() {
+        require(owner == payable(msg.sender), "You can't add an item to the shop.");
         _;
     }
 
@@ -50,7 +50,7 @@ contract Shop {
     }
 
     modifier hasPaid() {
-        require(msg.value == 5 ether, "You haven't paid yet");
+        require(msg.value == 5 ether, "You haven't paid yet or you haven't paid 5 ether");
         _;
     }
 
@@ -60,16 +60,18 @@ contract Shop {
         sellers[msg.sender].name = _name;
         sellers[msg.sender].sellerAddress = msg.sender;
         sellers[msg.sender].hasPaid = true;
+        sellers[msg.sender].isRegister = true;
         sellerCount++;
     }
 
     //to add an item in the shop 
-    function addItem(string memory _name, string memory _category, uint _price) public onlySeller {
+    function addItem(string memory _name, string memory _category, uint _price) public onlyOwner {
         items[itemCount].name = _name;
         items[itemCount].category = _category;
         items[itemCount].price = _price;
         items[itemCount].itemId = itemCount;
         items[itemCount].isActive = true;
+        items[itemCount].seller = msg.sender;
         itemCount++;
     }
 
