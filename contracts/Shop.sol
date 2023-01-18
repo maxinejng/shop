@@ -11,7 +11,6 @@ contract Shop {
         owner = payable(msg.sender);
     }
 
-
     //characteristic of a seller
     struct seller {
         string name;
@@ -20,22 +19,58 @@ contract Shop {
         bool isRegister;
     }
 
+    //item description in a struct  
+    struct item {
+        string name;
+        string category;
+        uint price;
+        uint itemId;
+        address payable seller;
+    }
+
     mapping(address => seller) sellers;
 
+    mapping(uint => item) items;
+
+    //count the total of seller 
     uint public sellerCount;
 
-    //new seller 
-    //he has to pay for using the platform
-    function sellerSignUp(string memory _name) public payable {
+    //count the total of item
+    uint public itemCount;
+
+    modifier onlySeller() {
+        require(items[itemCount].seller == msg.sender, "You can't add an item to the shop.");
+        _;
+    }
+
+    modifier notRegistered() {        
         require(!sellers[msg.sender].isRegister, "You are already registered");
+        _;
+    }
+
+    modifier hasPaid() {
         require(msg.value == 5 ether, "You haven't paid yet");
+        _;
+    }
+
+    //new seller                
+    //he has to pay for using the platform
+    function sellerSignUp(string memory _name) public payable notRegistered hasPaid {
         sellers[msg.sender].name = _name;
         sellers[msg.sender].sellerAddress = msg.sender;
         sellers[msg.sender].hasPaid = true;
         sellerCount++;
     }
 
-    //refund cancelled orders
+    //to add an item in the shop 
+    function addItem(string memory _name, string memory _category, uint _price) public onlySeller {
+        items[itemCount].name = _name;
+        items[itemCount].category = _category;
+        items[itemCount].price = _price;
+        items[itemCount].itemId = itemCount;
+        itemCount++;
+    }
+
 
 
 }
